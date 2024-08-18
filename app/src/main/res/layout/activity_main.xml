@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <!-- Top section: EditText, Button, and RadioGroup -->
+    <LinearLayout
+        android:id="@+id/topPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/btnInit"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:text="@string/initialize"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:ignore="VisualLintButtonSize,VisualLintBounds" />
+
+        <LinearLayout
+            android:id="@+id/fieldFreq"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <EditText
+                android:id="@+id/txtFreq"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="2"
+                android:autofillHints="2409"
+                android:hint="@string/frequency_in_mhz"
+                android:inputType="numberDecimal"
+                android:text="@string/_2409"
+                tools:ignore="VisualLintTextFieldSize,VisualLintBounds" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="0dp" />
+
+            <TextView
+                android:id="@+id/lblMHz"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:gravity="center_vertical"
+                android:text="@string/mhz"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="0dp" />
+
+            <Button
+                android:id="@+id/btnGo"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:text="@string/go"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                tools:ignore="VisualLintButtonSize,VisualLintBounds" />
+        </LinearLayout>
+
+        <RadioGroup
+            android:id="@+id/channelGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="0dp">
+
+            <RadioButton
+                android:id="@+id/channel0"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:text="@string/_0" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="0dp" />
+
+            <RadioButton
+                android:id="@+id/channel1"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:checked="true"
+                android:text="@string/_1" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="0dp" />
+
+            <RadioButton
+                android:id="@+id/channel2"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:text="@string/_2" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="0dp" />
+
+            <RadioButton
+                android:id="@+id/channel3"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:text="@string/_3" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="0dp" />
+
+            <RadioButton
+                android:id="@+id/channel4"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:text="@string/_4" />
+        </RadioGroup>
+    </LinearLayout>
+
+    <!-- Middle section: LineChart -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp">
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="32dp"/>
+    </FrameLayout>
+
+    <!-- Bottom section: Status bar -->
+    <TextView
+        android:id="@+id/statusBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#673AB7"
+        android:padding="0dp"
+        android:text="@string/status"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF" />
+
+</LinearLayout>
