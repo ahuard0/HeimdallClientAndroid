@@ -2,7 +2,6 @@ package com.huard.heimdallclientandroid;
 
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
@@ -53,9 +52,9 @@ public class MainActivity extends AppCompatActivity implements ControlClientList
     private TextView statusBar;
     private EditText txtFreq;
     private static int CHANNEL = 1;
-    private static int SAMPLE_SIZE = 16384;
+    private static int SAMPLE_SIZE = 32768;
     private static float SAMPLE_BANDWIDTH_MHz = 2.4f; // MHz
-    private static final float SINUSOID_FREQUENCY_MHz = -0.3f; // MHz, for generating example FFT data on startup
+    private static final float DEMO_SINUSOID_FREQUENCY_MHz = -0.3f; // MHz, for generating example FFT data on startup
     private static double[][] iqSamples;
 
     private static ArrayList<Double> MAX_POWER_dBm;
@@ -311,8 +310,8 @@ public class MainActivity extends AppCompatActivity implements ControlClientList
                 double randomI = 0.01f*(random.nextFloat() - 0.5f);
                 double randomQ = 0.01f*(random.nextFloat() - 0.5f);
                 // Sinusoid
-                double sinusoidI = Math.cos(2 * Math.PI * SINUSOID_FREQUENCY_MHz * t);
-                double sinusoidQ = Math.sin(2 * Math.PI * SINUSOID_FREQUENCY_MHz * t);
+                double sinusoidI = Math.cos(2 * Math.PI * DEMO_SINUSOID_FREQUENCY_MHz * t);
+                double sinusoidQ = Math.sin(2 * Math.PI * DEMO_SINUSOID_FREQUENCY_MHz * t);
 
                 iqSamples[j][2 * i] = randomI + sinusoidI;
                 iqSamples[j][2 * i + 1] = randomQ + sinusoidQ;
@@ -385,7 +384,7 @@ public class MainActivity extends AppCompatActivity implements ControlClientList
     }
 
     private void computeFFT() {
-        double frequencyStep = SAMPLE_BANDWIDTH_MHz / SAMPLE_SIZE;
+
         for (int j=0; j<5; j++) {
             double[][] fftResult = computeFFT(iqSamples[j]);
             double[][] shiftedFftResult = fftShift(fftResult); // [real,imag][n_samples]
@@ -394,6 +393,7 @@ public class MainActivity extends AppCompatActivity implements ControlClientList
             POWER_dBm.get(j).clear();
 
             int num_samples = shiftedFftResult[0].length;
+            double frequencyStep = SAMPLE_BANDWIDTH_MHz / num_samples;
             for (int i = 0; i < num_samples; i++) {
                 double fs_MHz = i * frequencyStep - SAMPLE_BANDWIDTH_MHz / 2;
                 double V_mV_real = shiftedFftResult[0][i];
@@ -436,7 +436,7 @@ public class MainActivity extends AppCompatActivity implements ControlClientList
 
     private void processData(float[][] data, @NonNull HeaderIQ header) {
         iqSamples = convertFloatArrayToDouble(data);
-        SAMPLE_SIZE = data[0].length/2;
+        SAMPLE_SIZE = (int) header.getCpiLength();
         SAMPLE_BANDWIDTH_MHz = (float)header.getSamplingFreq()/1E6f;
         Log.i(TAG, "I/Q Data received: Size " + SAMPLE_SIZE);
 

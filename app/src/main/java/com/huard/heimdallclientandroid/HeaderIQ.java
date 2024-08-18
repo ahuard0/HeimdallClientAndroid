@@ -27,7 +27,7 @@ public class HeaderIQ {
     @SuppressWarnings("unused")
     public static final int FRAME_TYPE_EMPTY = 5;
 
-    private static final int SYNC_WORD = 0x2BF7B95A;
+    public static final int SYNC_WORD = 0x2BF7B95A;
 
     // Header fields
     private int syncWord;
@@ -223,6 +223,12 @@ public class HeaderIQ {
     public int getFrameType() { return frameType; }
 
     public long getSamplingFreq() { return samplingFreq; }
+
+    public int getSyncState() { return syncState; }
+
+    public int getDataType() { return dataType; }
+
+    public int getSyncWord() { return syncWord; }
 
     @SuppressWarnings("unused")
     public boolean checkSyncWord() {
