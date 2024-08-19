@@ -174,6 +174,48 @@ public class DataClient {
                 }
             }
 
+            if (iqHeader.getFrameType() == HeaderIQ.FRAME_TYPE_DATA) {
+                Log.d(TAG, "FRAME_TYPE_DATA");
+            }
+            else if (iqHeader.getFrameType() == HeaderIQ.FRAME_TYPE_CAL) {
+                Log.d(TAG, "FRAME_TYPE_CAL");
+            }
+            else if (iqHeader.getFrameType() == HeaderIQ.FRAME_TYPE_DUMMY) {
+                Log.d(TAG, "FRAME_TYPE_DUMMY");
+            }
+            else if (iqHeader.getFrameType() == HeaderIQ.FRAME_TYPE_RAMP) {
+                Log.d(TAG, "FRAME_TYPE_RAMP");
+            }
+            else if (iqHeader.getFrameType() == HeaderIQ.FRAME_TYPE_EMPTY) {
+                Log.d(TAG, "FRAME_TYPE_EMPTY");
+            }
+            else if (iqHeader.getFrameType() == HeaderIQ.FRAME_TYPE_TRIGW) {
+                Log.d(TAG, "FRAME_TYPE_TRIGW");
+            }
+            else {
+                Log.d(TAG, "Unknown Frame Type");
+            }
+
+            if (iqHeader.getSyncWord() != HeaderIQ.SYNC_WORD) {
+                Log.d(TAG, "Sync Word Mismatch");
+            }
+
+            if (iqHeader.getSyncState() < 1) {
+                Log.d(TAG, "Out of Sync");
+            }
+
+            if (iqHeader.getNoiseSourceState() > 0) {
+                Log.d(TAG, "Noise Source On");
+            }
+
+            if (iqHeader.getIqSyncFlag() < 1) {
+                Log.d(TAG, "IQ Out of Sync");
+            }
+
+            if (iqHeader.getDataType() != 3) {
+                Log.d(TAG, "Data Type is not 3");
+            }
+
 
             return iqSamples;  // Return the array of IQ samples
         } else {

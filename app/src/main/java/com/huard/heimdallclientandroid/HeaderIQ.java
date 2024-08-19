@@ -226,9 +226,13 @@ public class HeaderIQ {
 
     public int getSyncState() { return syncState; }
 
-    public int getDataType() { return dataType; }
-
     public int getSyncWord() { return syncWord; }
+
+    public int getNoiseSourceState() { return noiseSourceState; }
+
+    public int getIqSyncFlag() { return iqSyncFlag; }
+
+    public int getDataType() { return dataType; }
 
     @SuppressWarnings("unused")
     public boolean checkSyncWord() {
