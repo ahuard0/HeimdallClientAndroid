@@ -234,6 +234,14 @@ public class HeaderIQ {
 
     public int getDataType() { return dataType; }
 
+    public int getIndexCPI() { return cpiIndex; }
+
+    public int[] getIfGains() { return ifGains; }
+
+    public int getAdcOverdriveFlags() { return adcOverdriveFlags; }
+
+    public long getIooType() { return iooType; }
+
     @SuppressWarnings("unused")
     public boolean checkSyncWord() {
         return syncWord == SYNC_WORD;

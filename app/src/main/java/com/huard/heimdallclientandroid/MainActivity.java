@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements ControlClientList
         controlClient.sendFrequency(freq_MHz);
         controlClient.sendSquelchThreshold(0.5f);
         controlClient.sendInit();
-        //controlClient.sendExit();
+        controlClient.sendExit();
         controlClient.disconnect();
     }
 
@@ -167,8 +167,8 @@ public class MainActivity extends AppCompatActivity implements ControlClientList
         });
 
         initializeChart();
-        //iqSamples = generateIQSamples();  // generate random IQ Samples for initial FFT Plot
-        iqSamples = loadIqDataFromFile();
+        iqSamples = generateIQSamples();  // generate random IQ Samples for initial FFT Plot
+        //iqSamples = loadIqDataFromFile();
 
         computeFFT();
         plotFFT();
@@ -298,6 +298,7 @@ public class MainActivity extends AppCompatActivity implements ControlClientList
         y.setAxisMinimum(-60f);
     }
 
+    @SuppressWarnings("unused")
     @NonNull
     private double[][] generateIQSamples() {
         Random random = new Random();
@@ -319,48 +320,6 @@ public class MainActivity extends AppCompatActivity implements ControlClientList
         }
 
         return iqSamples;
-    }
-
-    @SuppressWarnings("unused")
-    @NonNull
-    private double[] applyHammingWindow(double[] iqSamples) {
-        int N = iqSamples.length / 2; // Since iqSamples contains interleaved I/Q samples
-        double[] windowedSamples = new double[iqSamples.length];
-
-        for (int i = 0; i < N; i++) {
-            double hammingValue = 0.54 - 0.46 * Math.cos(2 * Math.PI * i / (N - 1));
-            windowedSamples[2 * i] = iqSamples[2 * i] * hammingValue;     // Real part
-            windowedSamples[2 * i + 1] = iqSamples[2 * i + 1] * hammingValue; // Imaginary part
-        }
-
-        return windowedSamples;
-    }
-
-    @SuppressWarnings("unused")
-    @NonNull
-    private double[] applyBlackmanWindow(double[] iqSamples) {
-        int N = iqSamples.length / 2;
-        double[] windowedSamples = new double[iqSamples.length];
-
-        for (int i = 0; i < N; i++) {
-            double blackmanValue = 0.42 - 0.5 * Math.cos(2 * Math.PI * i / (N - 1)) + 0.08 * Math.cos(4 * Math.PI * i / (N - 1));
-            windowedSamples[2 * i] = iqSamples[2 * i] * blackmanValue;
-            windowedSamples[2 * i + 1] = iqSamples[2 * i + 1] * blackmanValue;
-        }
-
-        return windowedSamples;
-    }
-
-    private double[] applyWindow(double[] iqSamplesRI) {
-        int n = iqSamplesRI.length / 2; // Number of complex samples
-        for (int i = 0; i < n; i++) {
-            double windowValue = 0.5 * (1 - Math.cos(2 * Math.PI * i / (n - 1))); // Example: Hamming window
-
-            // Apply window to both real and imaginary parts
-            iqSamplesRI[2 * i] *= windowValue;     // Real part
-            iqSamplesRI[2 * i + 1] *= windowValue; // Imaginary part
-        }
-        return iqSamplesRI;
     }
 
     public static double[][] convertInterleavedToSeparate(double[] iqSamples) {
@@ -450,15 +409,16 @@ public class MainActivity extends AppCompatActivity implements ControlClientList
         //saveIqDataToFile(iqSamples);
     }
 
+    @SuppressWarnings("unused")
     private void saveIqDataToFile(double[][] iqData) {
         File file = new File(getExternalFilesDir(null), "iq_data.bin");
         try (FileOutputStream fos = new FileOutputStream(file, false)) { // false for overwrite mode
             // Assuming each float corresponds to a real or imaginary part
             ByteBuffer byteBuffer = ByteBuffer.allocate(4 * iqData.length * iqData[0].length); // 4 bytes for a float
             byteBuffer.order(ByteOrder.LITTLE_ENDIAN); // Make sure the order is the same as in Python
-            for (int j=0; j<iqData.length; j++) {
-                for (int i=0; i<iqData[j].length; i++) {
-                    byteBuffer.putFloat((float)iqData[j][i]);
+            for (double[] iqDatum : iqData) {
+                for (double v : iqDatum) {
+                    byteBuffer.putFloat((float) v);
                 }
             }
             fos.write(byteBuffer.array());
@@ -532,27 +492,39 @@ public class MainActivity extends AppCompatActivity implements ControlClientList
     @Override
     protected void onPause() {
         super.onPause();
-        if (dataClient != null) {
-            dataClient.disconnect();
-        }
-        if (controlClient != null) {
-            controlClient.disconnect();
+        if (isInitialized) {
+            if (dataClient != null) {
+                dataClient.disconnect();
+            }
+            if (controlClient != null) {
+                controlClient.disconnect();
+            }
         }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (dataClient != null) {
-            dataClient.disconnect();
-        }
-        if (controlClient != null) {
-            controlClient.disconnect();
+        if (isInitialized) {
+            if (dataClient != null) {
+                dataClient.disconnect();
+            }
+            if (controlClient != null) {
+                controlClient.disconnect();
+            }
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (isInitialized) {
+            if (dataClient != null) {
+                dataClient.disconnect();
+            }
+            if (controlClient != null) {
+                controlClient.disconnect();
+            }
+        }
     }
 }

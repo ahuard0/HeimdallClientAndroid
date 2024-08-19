@@ -42,8 +42,9 @@ public class DataClient {
                 if (!isConnected()) {
                     Log.i(TAG, "Attempting to access host " + host + " at port " + port);
                     socket = new Socket(host, port);
-                    socket.setKeepAlive(true);
-                    // socket.setSoTimeout(60000);  // Set timeout for blocking operations
+                    socket.setKeepAlive(false);
+                    socket.setSoTimeout(15000);  // Set timeout for blocking operations
+                    socket.setReceiveBufferSize(15*1024 * 1024);
                     inputStream = socket.getInputStream();
                     outputStream = socket.getOutputStream();
                     running = true;
@@ -61,19 +62,41 @@ public class DataClient {
         outputStream.write("streaming".getBytes()); // Start streaming
     }
 
+    public static float computeRMS(float[] vector) {
+        float sumOfSquares = 0.0f;
+        int totalElements = 0;
+
+        for (float value : vector) {
+            sumOfSquares += value * value;
+            totalElements++;
+        }
+
+        float meanOfSquares = sumOfSquares / totalElements;
+        return (float) Math.sqrt(meanOfSquares);
+    }
+
+    private boolean checkIntegrityIQ(float[][] iqFrame) {
+        float rmsValue = computeRMS(iqFrame[4]);  // check for variations in the unused channel
+        if (rmsValue < 0.01) {
+            Log.i(TAG, "IQ RMS mV: " + rmsValue);
+            return false;
+        } else
+            return true;
+    }
+
     private void listen() {
         executorService.execute(() -> {
             try {
                 while (running && !Thread.currentThread().isInterrupted()) {
                     if (isConnected()) {
-                        //outputStream.flush();
                         outputStream.write("IQDownload".getBytes()); // Request IQ data
 
                         float[][] iqFrame = receiveIqFrame(); // Implement this to process incoming data
                         if (iqHeader.getFrameType() == HeaderIQ.FRAME_TYPE_DATA)
                             if (dataClientListener != null)
                                 if (iqFrame != null)
-                                    dataClientListener.notifyDataClient(iqFrame, iqHeader);
+                                    if (checkIntegrityIQ(iqFrame))
+                                        dataClientListener.notifyDataClient(iqFrame, iqHeader);
                     } else {
                         Log.e(TAG, "Socket is not connected, attempting to reconnect...");
                         reconnect();
@@ -86,6 +109,7 @@ public class DataClient {
         });
     }
 
+    @SuppressWarnings("unused")
     private boolean isConnectionHealthy() {
         try {
             // Try writing a small byte to check if the connection is alive
