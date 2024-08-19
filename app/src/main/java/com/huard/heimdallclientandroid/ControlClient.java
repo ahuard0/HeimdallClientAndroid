@@ -5,6 +5,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -54,7 +55,8 @@ public class ControlClient {
             try {
                 if (!isConnected()) {
                     Log.i(TAG, "Attempting to access host " + host + " at port " + port);
-                    socket = new Socket(host, port);
+                    socket = new Socket();
+                    socket.connect(new InetSocketAddress(host, port), 5000);
                     inputStream = socket.getInputStream();
                     outputStream = socket.getOutputStream();
                     Log.i(TAG, "Connected to control port " + port);
